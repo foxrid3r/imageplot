@@ -13,7 +13,7 @@ from PIL import Image
 from .artists.base import Layer
 from .artists.shapes import CircleCloud, EllipseCloud, PolygonCloud, RectangleCloud
 from .coordinates import CoordinateSystem
-from .metadata import load_png_metadata
+from .metadata import load_png_image, read_png_metadata
 
 
 class ImagePlot:
@@ -27,7 +27,7 @@ class ImagePlot:
     def __init__(
         self,
         image_path: str | Path,
-        coordinate_system: str | None = None,
+        coordinate_system: str | CoordinateSystem | None = None,
         *,
         ax: Axes | None = None,
         figsize: tuple[float, float] | None = None,
@@ -36,9 +36,20 @@ class ImagePlot:
         interpolation: str = "nearest",
     ) -> None:
         self.image_path = Path(image_path)
-        self.image, self.metadata = load_png_metadata(self.image_path)
-        self.coordinate_systems = self._load_coordinate_systems()
-        self.coordinate_system = self._select_coordinate_system(coordinate_system)
+        self.image = load_png_image(self.image_path)
+
+        if isinstance(coordinate_system, CoordinateSystem):
+            self.metadata = read_png_metadata(self.image_path, required=False)
+            self.coordinate_systems = (
+                self._load_coordinate_systems() if self.metadata is not None else {}
+            )
+            self.coordinate_systems = dict(self.coordinate_systems)
+            self.coordinate_systems[coordinate_system.name] = coordinate_system
+            self.coordinate_system = coordinate_system
+        else:
+            self.metadata = read_png_metadata(self.image_path, required=True)
+            self.coordinate_systems = self._load_coordinate_systems()
+            self.coordinate_system = self._select_coordinate_system(coordinate_system)
 
         if ax is None:
             self.figure, self.ax = plt.subplots(figsize=figsize, dpi=dpi)

@@ -1,66 +1,85 @@
 # Image Data Overlay Tool
 
-A Matplotlib-first Python library for plotting engineering data over PNG images created with the PNG Coordinate System Metadata Editor.
+A Matplotlib-first Python library for plotting engineering data over PNG images using full 2D affine coordinate systems.
 
-The library reads the embedded `coordinate_systems_json` iTXt chunk, constructs the full pixel-to-world affine transform, and places the image in world-coordinate space. Your points and shapes can then be plotted with ordinary Matplotlib calls.
+Coordinate systems can be loaded from the PNG Coordinate System Metadata Editor or created programmatically.
 
 ## Install
-
-From this directory:
 
 ```powershell
 python -m pip install -e .
 ```
 
-## Basic use
+## Use embedded PNG metadata
 
 ```python
 from imageplot import ImagePlot
 
 plot = ImagePlot("fixture.png", coordinate_system="Fixture")
 plot.scatter([(10, 15), (12, 18), (14, 17)], label="Measured")
-plot.plot([(0, 0), (25, 10)], label="Path")
 plot.legend()
 plot.show()
 ```
 
-The underlying objects remain normal Matplotlib objects:
+## Create a coordinate system programmatically
 
 ```python
-plot.ax.grid(True)
-plot.ax.set_title("Inspection results")
-plot.figure.tight_layout()
+from imageplot import CoordinateSystem, ImagePlot
+
+fixture = CoordinateSystem.from_points(
+    name="Fixture",
+    origin_pixel=(1250, 820),
+    origin_world=(0.0, 0.0),
+    x_point_pixel=(1750, 850),
+    x_point_world=(100.0, 0.0),
+    y_point_pixel=(1220, 320),
+    y_point_world=(0.0, 100.0),
+)
+
+# The PNG does not need embedded metadata for this workflow.
+plot = ImagePlot("fixture.png", coordinate_system=fixture)
+plot.scatter([(10, 15), (12, 18)])
+plot.show()
 ```
 
-## Shape clouds
+## Embed a programmatically created coordinate system
 
 ```python
-plot.circles(centers, radii=2.5, alpha=0.08)
-plot.ellipses(centers, widths, heights, angles)
-plot.rectangles(centers, widths, heights, angles)
-plot.polygons(list_of_vertex_arrays, alpha=0.1)
+from imageplot import CoordinateSystem, add_coordinate_system
+
+fixture = CoordinateSystem.from_points(
+    name="Fixture",
+    origin_pixel=(1250, 820),
+    origin_world=(0.0, 0.0),
+    x_point_pixel=(1750, 850),
+    x_point_world=(100.0, 0.0),
+    y_point_pixel=(1220, 320),
+    y_point_world=(0.0, 100.0),
+)
+
+add_coordinate_system("fixture.png", fixture)
 ```
 
-These methods use Matplotlib patch collections and are suitable for large Monte Carlo populations.
+The resulting `coordinate_systems_json` iTXt metadata is compatible with the existing PNG Coordinate System Metadata Editor.
+
+Use `replace=False` to reject a duplicate name instead of replacing it:
+
+```python
+add_coordinate_system("fixture.png", fixture, replace=False)
+```
+
+## Load coordinate systems directly
+
+```python
+from imageplot import load_coordinate_systems
+
+for system in load_coordinate_systems("fixture.png"):
+    print(system.name, system.handedness)
+```
 
 ## Coordinate conversions
 
 ```python
 pixels = plot.world_to_pixel(world_points)
 world = plot.pixel_to_world(pixel_points)
-
-matrix = plot.coordinate_system.pixel_to_world_matrix
-print(plot.coordinate_system.handedness)
 ```
-
-## Included examples
-
-Run these from the project directory:
-
-```powershell
-python examples/create_demo_png.py
-python examples/basic_points.py
-python examples/monte_carlo_shapes.py
-```
-
-Generated images are written to `output/`.
