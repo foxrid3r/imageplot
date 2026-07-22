@@ -6,15 +6,43 @@ build-backend = "setuptools.build_meta"
 name = "imageplot"
 version = "0.2.0"
 description = "Plot engineering data over PNG images with affine coordinate systems"
+readme = "README.md"
 requires-python = ">=3.10"
+authors = [
+    { name = "imageplot contributors" },
+]
+keywords = ["matplotlib", "png", "coordinate-system", "engineering", "image-overlay"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
     "matplotlib>=3.8",
     "numpy>=1.24",
     "Pillow>=10.0",
+    "pandas>=2.0",
+    "openpyxl>=3.1",
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=8.0"]
+dev = [
+    "pytest>=8.0",
+]
+test = [
+    "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.setuptools.packages.find]
 where = ["."]

@@ -1,27 +1,35 @@
-# Image Data Overlay Tool
+# imageplot
 
 A Matplotlib-first Python library for plotting engineering data over PNG images using full 2D affine coordinate systems.
 
-Coordinate systems can be loaded from the PNG Coordinate System Metadata Editor or created programmatically.
+Coordinate systems can be loaded from PNG metadata or created programmatically.
 
-## Install
+## Overview
+
+`imageplot` lets you:
+
+- display data over a PNG image using a coordinate system,
+- load coordinate systems from PNG metadata,
+- define coordinate systems directly in Python,
+- convert between world and pixel coordinates.
+
+## Installation
+
+Install the package in editable mode for local development:
 
 ```powershell
 python -m pip install -e .
 ```
 
-## Use embedded PNG metadata
+To install test and development tooling as well:
 
-```python
-from imageplot import ImagePlot
-
-plot = ImagePlot("fixture.png", coordinate_system="Fixture")
-plot.scatter([(10, 15), (12, 18), (14, 17)], label="Measured")
-plot.legend()
-plot.show()
+```powershell
+python -m pip install -e ".[dev]"
 ```
 
-## Create a coordinate system programmatically
+## Quick start
+
+The most common workflow is to create a coordinate system and plot against an image.
 
 ```python
 from imageplot import CoordinateSystem, ImagePlot
@@ -36,13 +44,28 @@ fixture = CoordinateSystem.from_points(
     y_point_world=(0.0, 100.0),
 )
 
-# The PNG does not need embedded metadata for this workflow.
 plot = ImagePlot("fixture.png", coordinate_system=fixture)
-plot.scatter([(10, 15), (12, 18)])
+plot.scatter([(10, 15), (12, 18), (14, 17)], label="Measured")
+plot.legend()
 plot.show()
 ```
 
-## Embed a programmatically created coordinate system
+## Use an embedded coordinate system from PNG metadata
+
+If your PNG already contains a coordinate system in its metadata, you can load it by name:
+
+```python
+from imageplot import ImagePlot
+
+plot = ImagePlot("fixture.png", coordinate_system="Fixture")
+plot.scatter([(10, 15), (12, 18), (14, 17)], label="Measured")
+plot.legend()
+plot.show()
+```
+
+## Create and save a coordinate system into PNG metadata
+
+You can generate a coordinate system in Python and embed it into an image.
 
 ```python
 from imageplot import CoordinateSystem, add_coordinate_system
@@ -60,9 +83,9 @@ fixture = CoordinateSystem.from_points(
 add_coordinate_system("fixture.png", fixture)
 ```
 
-The resulting `coordinate_systems_json` iTXt metadata is compatible with the existing PNG Coordinate System Metadata Editor.
+The resulting `coordinate_systems_json` iTXt metadata is compatible with the PNG Coordinate System Metadata Editor.
 
-Use `replace=False` to reject a duplicate name instead of replacing it:
+To reject duplicate entries instead of replacing them:
 
 ```python
 add_coordinate_system("fixture.png", fixture, replace=False)
@@ -79,7 +102,14 @@ for system in load_coordinate_systems("fixture.png"):
 
 ## Coordinate conversions
 
+The plotting object can convert between pixel and world coordinates:
+
 ```python
 pixels = plot.world_to_pixel(world_points)
 world = plot.pixel_to_world(pixel_points)
 ```
+
+## Example scripts
+
+The repository includes example scripts under the [examples](examples) directory for common usage patterns.
+
