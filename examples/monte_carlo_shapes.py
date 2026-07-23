@@ -27,5 +27,4 @@ plot.rectangles(
 plot.scatter(centers, s=3, alpha=0.15, label="Simulated centers")
 plot.ax.set_title("Monte Carlo placement population")
 plot.legend()
-plot.save(output_path)
-print(output_path)
+plot.show()

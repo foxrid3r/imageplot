@@ -6,7 +6,6 @@ from imageplot import ImagePlot
 
 ROOT = Path(__file__).resolve().parents[1]
 image_path = ROOT / "examples" / "demo_fixture.png"
-output_path = ROOT / "output" / "basic_points.png"
 
 rng = np.random.default_rng(7)
 measured = rng.normal(loc=(145, 82), scale=(16, 9), size=(80, 2))
@@ -19,5 +18,4 @@ plot.scatter(rejected, s=70, marker="x", linewidths=2, label="Rejected")
 plot.plot(path, linewidth=2, marker="o", label="Programmed path")
 plot.ax.set_title("Fixture measurement overlay")
 plot.legend()
-plot.save(output_path)
-print(output_path)
+plot.show()

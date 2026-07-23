@@ -27,6 +27,12 @@ To install test and development tooling as well:
 python -m pip install -e ".[dev]"
 ```
 
+The Excel example has optional dependencies:
+
+```powershell
+python -m pip install -e ".[excel]"
+```
+
 ## Quick start
 
 The most common workflow is to create a coordinate system and plot against an image.
@@ -112,4 +118,25 @@ world = plot.pixel_to_world(pixel_points)
 ## Example scripts
 
 The repository includes example scripts under the [examples](examples) directory for common usage patterns.
+
+### Point and path overlays
+
+[View the example script](examples/plot_demo_points.py).
+
+![Fixture measurement overlay](docs/demo_points-plot.png)
+
+### Plot points loaded from Excel
+
+[View the example script](examples/plot_block_points_from_excel.py). The same
+world-coordinate data remains aligned when the source image is rotated.
+
+| Original image | Rotated image |
+| --- | --- |
+| ![Excel points plotted over a block](docs/block-with-holes-plot.png) | ![Excel points plotted over a rotated block](docs/block-with-holes-rotated-plot.png) |
+
+### Monte Carlo shape overlays
+
+[View the example script](examples/monte_carlo_shapes.py).
+
+![Monte Carlo placement population](docs/monte-carlo-shapes-plot.png)
 
